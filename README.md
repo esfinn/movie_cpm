@@ -23,6 +23,6 @@ And if you wanted to generate a null distribution of 10,000 model to compare, yo
 
 `python mk_jobs.py --clip MOVIE1 --behav cogn_PC1 --rand_behav 1 --n_iter 10000`
 
-To run a single iteration of CPM (which can easily be done on most local machines), you can run:
+To run a single iteration of CPM (which can easily be done locally in ~1min on most machines), you can run:
 
 `python cpm_wrapper.py --clip MOVIE1 --behav cogn_PC1`
