@@ -3,14 +3,15 @@ import os
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--clip", dest="clip", type=str,
-    help="name of clip to calculcate FC data from (e.g., MOVIE1, bridgeville)")
+                    help="name of clip to calculcate FC data from (e.g., MOVIE1, bridgeville)")
 parser.add_argument("--behav", dest="behav", type=str,
-    help="name of behavior you are trying to predict (e.g., ListSort_Unadj)")
-parser.add_argument("--gsr", dest="gsr", type=int)
-parser.add_argument("--zscore", dest="zscore", type=int)
-parser.add_argument("--model_type", dest="model_type", type=str, default="cpm",
-                    help="type of model to use (cpm or krr)")
-parser.add_argument("--total_trs", dest="total_trs", type=int, default=None)
+                    help="name of behavior you are trying to predict (e.g., ListSort_Unadj); must correspond to the name of a column in ../data/all_behav.csv")
+parser.add_argument("--gsr", dest="gsr", type=int, default=1,
+                    help="whether or not to use matrices with GSR (1 = use GSR, 0 = don't use GSR")
+parser.add_argument("--zscore", dest="zscore", type=int, default=0,
+                    help="whether to zscore edges within subjects")
+parser.add_argument("--total_trs", dest="total_trs", type=int, default=None,
+                    help="how many TRs to use for FC calculation ("None" uses all available TRs for this run")
 parser.add_argument("--cut_out_rest", dest="cut_out_rest", type=int, default=1,
                     help="whether or not to cut out rest blocks when calculating FC (only applies to full movie runs)")
 parser.add_argument("--same_rest_block", dest="same_rest_block", type=int, default=0,
@@ -21,8 +22,10 @@ parser.add_argument("--rand_behav", dest="rand_behav", type=int, default=0,
                     help="whether or not to randomize behavior (for perm test)")
 parser.add_argument("--reg_cfds", dest="reg_cfds", type=int, default=1,
                     help="whether or not to regress confounds (motion, TOD) from y")
-parser.add_argument("--f_name", dest="f_name", type=str, default="jobs.txt", help="what to call jobs file")
-parser.add_argument("--rewrite", dest="rewrite", type=bool, default=False, help="whether to rewrite jobs file if it already exists, or append to it")
+parser.add_argument("--f_name", dest="f_name", type=str, default="jobs.txt",
+                    help="what to call jobs file")
+parser.add_argument("--rewrite", dest="rewrite", type=bool, default=False,
+                    help="whether to rewrite jobs file if it already exists (True), or append to it (False)")
 args = parser.parse_args()
 
 clip = args.clip

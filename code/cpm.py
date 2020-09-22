@@ -1,14 +1,10 @@
 import numpy as np
 import scipy as sp
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
-import matplotlib.transforms as mtransforms
 import os
 import sys
 import pickle
 import json
 import pandas as pd
-import seaborn as sns
 from random import shuffle
 from itertools import chain
 from sklearn.linear_model import LinearRegression
@@ -52,7 +48,7 @@ def mk_subjwise_ts_dict(clip, gsr=0, start_stop_pads = (10, 5),
                         cut_out_rest = True, # applies to full MOVIE runs
                         same_rest_block = False, # applies to individual clips
                         total_trs = None, subj_list='subj_list.npy',
-                        data_dir='../data/all_shen268_roi_ts/'):
+                        data_dir='../data/all_shen_roi_ts/'):
 
     subj_list = np.load(subj_list, allow_pickle=True)
     video_tr_lookup = pd.read_csv('../data/video_tr_lookup.csv')
@@ -293,21 +289,6 @@ def residualize(y,confounds):
     for confound in confounds.columns:
         print("Corr between y and {} AFTER regression: {:.3f}".format(confound, sp.stats.pearsonr(y_resid, confounds[confound])[0]))
 
-    # for tail, mask in mask_dict.items():
-    #     tmp = fc_vcts.loc[:, mask].sum(axis=1)
-    #     y = tmp.values.reshape(-1,1)
-    #     X = confounds
-    #
-    #     for confound in confounds.columns:
-    #         print("Corr between FCsum_{} and {} BEFORE regression: {:.3f}".format(tail, confound, sp.stats.pearsonr(tmp, confounds[confound])[0]))
-    #
-    #     lm = LinearRegression().fit(X, y)
-    #     resids = y - lm.predict(X)
-    #     fc_sums_dict[tail] = pd.Series(resids.flatten(), index=fc_vcts.index)
-    #
-    #     for confound in confounds.columns:
-    #     	print("Corr between FCsum_{} and {} AFTER regression: {:.3f}".format(tail, confound, sp.stats.pearsonr(fc_sums_dict[tail], confounds[confound])[0]))
-
     return y_resid, lm
 
 # ----------------------------------------------------------------------------------------------------
@@ -348,12 +329,6 @@ def sum_features(fc_vcts, mask_dict):
 # ----------------------------------------------------------------------------------------------------
 def build_model(fc_sums_dict, train_behav, include_motion_train=False, include_motion_test=False):
 
-  #  if include_motion_train is True:
-  #      assert train_motion is not None, "Train motion not provided!"
-  #      assert train_behav.index.equals(train_motion.index), "Row indices of behav and motion don't match!"
-  #      for tail, fc_sum in fc_sums_dict.items():
-  #         assert fc_sum.index.equals(train_motion.index), "Row indices of test FC vcts and motion don't match!"
-
     print("Building linear regression model...")
     model_dict = {}
 
@@ -387,9 +362,6 @@ def build_model(fc_sums_dict, train_behav, include_motion_train=False, include_m
         model = LinearRegression()
         model_dict['glm'] = model.fit(X,y)
 
-    # X_glm = np.c_[X_glm, np.ones(X_glm.shape[0])]
-    # model_dict["glm"] = tuple(np.linalg.lstsq(X_glm, y, rcond=None)[0])
-
     return model_dict
 
 # ----------------------------------------------------------------------------------------------------
@@ -405,7 +377,6 @@ def apply_model(fc_sums_dict, mask_dict, model_dict, test_motion=None, include_m
     if include_motion_test is False:
         # Loop through pos and neg tails
         for tail, fc_sum in fc_sums_dict.items():
-            # X = np.array(fc_sum.values).T
             X = fc_sum.values.reshape(-1,1)
             tmp_model = model_dict[tail]
             tmp_model.coef_ = tmp_model.coef_[0] # drop the motion beta weight

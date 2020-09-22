@@ -6,17 +6,22 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--clip", dest="clip", type=str, help="name of clip to calculcate FC data from (e.g., MOVIE1, bridgeville)")
-parser.add_argument("--behav", dest="behav", type=str, help="name of behavior you are trying to predict (e.g., ListSort_Unadj)")
-parser.add_argument("--gsr", dest="gsr", type=int)
-parser.add_argument("--zscore", dest="zscore", type=int)
-parser.add_argument("--total_trs", dest="total_trs", type=int, default=None)
+parser.add_argument("--clip", dest="clip", type=str,
+                    help="name of clip to calculcate FC data from (e.g., MOVIE1, bridgeville)")
+parser.add_argument("--behav", dest="behav", type=str,
+                    help="name of behavior you are trying to predict (e.g., ListSort_Unadj); must correspond to the name of a column in ../data/all_behav.csv")")
+parser.add_argument("--gsr", dest="gsr", type=int, default=1,
+                    help="whether or not to use matrices with GSR (1 = use GSR, 0 = don't use GSR")
+parser.add_argument("--zscore", dest="zscore", type=int, default=0,
+                    help="whether to zscore edges within subjects")
+parser.add_argument("--total_trs", dest="total_trs", type=int, default=None,
+                    help="how many TRs to use for FC calculation ("None" uses all available TRs for this run")
 parser.add_argument("--cut_out_rest", dest="cut_out_rest", type=int, default=1,
-                    help="whether or not to cut out rest blocks when calculating FC (only applies to full movie runs)")
+                    help="whether or not to cut out 20s rest blocks when calculating FC (only applies to full movie runs)")
 parser.add_argument("--same_rest_block", dest="same_rest_block", type=int, default=0,
                     help="whether to use the matched block from the REST run in the same session (only applies to individual clips)")
 parser.add_argument("--rand_behav", dest="rand_behav", type=int, default=0,
-                    help="whether or not to randomize behavior (for permutation test)")
+                    help="whether or not to randomize behavior (for permutation testing)")
 parser.add_argument("--iter_no", dest="iter_no", type=int, default=0,
                     help="number of this iteration")
 args = parser.parse_args()
@@ -64,7 +69,7 @@ fc_kwargs = {
 }
 
 cpm_kwargs = {
-    'r_thresh': 0.1
+    'r_thresh': 0.2
 }
 
 indices = cpm.mk_kfold_indices(**kfold_kwargs)
